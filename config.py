@@ -7,6 +7,9 @@ class StorageConfig:
     DOWNLOAD_DIR: str = field(default_factory=lambda: os.getenv('DOWNLOAD_DIR', '/app/downloads'))
     TASKS_FILE: str = field(default_factory=lambda: os.getenv('TASKS_FILE', 'jsons/tasks.json'))
     KEYS_FILE: str = field(default_factory=lambda: os.getenv('KEYS_FILE', 'jsons/api_keys.json'))
+    COOKIES_FILE: str = field(default_factory=lambda: os.getenv('COOKIES_FILE', '/tmp/cookies.txt'))
+    COOKIES_CONTENT: str = field(default_factory=lambda: os.getenv('COOKIES_CONTENT', ''))
+    COOKIES_B64: str = field(default_factory=lambda: os.getenv('COOKIES_B64', ''))
 
 @dataclass
 class TaskConfig:

@@ -1,4 +1,5 @@
 import os
+import base64
 import json
 import time
 import shutil
@@ -20,9 +21,27 @@ class YTDownloader:
     def __init__(self):
         self.executor = ThreadPoolExecutor(max_workers=task_config.MAX_WORKERS)
         self._ensure_download_dir()
-    
+        self._write_cookies_file()
+
     def _ensure_download_dir(self):
         os.makedirs(storage.DOWNLOAD_DIR, exist_ok=True)
+
+    def _write_cookies_file(self):
+        content = ''
+        if storage.COOKIES_B64:
+            content = base64.b64decode(storage.COOKIES_B64).decode('utf-8')
+        elif storage.COOKIES_CONTENT:
+            content = storage.COOKIES_CONTENT
+        if content:
+            os.makedirs(os.path.dirname(storage.COOKIES_FILE), exist_ok=True)
+            with open(storage.COOKIES_FILE, 'w') as f:
+                f.write(content)
+            os.chmod(storage.COOKIES_FILE, 0o600)
+
+    def _cookies_opts(self) -> dict:
+        if os.path.exists(storage.COOKIES_FILE):
+            return {'cookiefile': storage.COOKIES_FILE}
+        return {}
     
     def _get_task_dir(self, task_id: str) -> str:
         return os.path.join(storage.DOWNLOAD_DIR, task_id)
@@ -51,6 +70,7 @@ class YTDownloader:
                 'extract_flat': False,
                 'skip_download': True,
                 'extractor_args': { 'youtube': { 'player_client': ['default', '-tv_simply'], }, },
+                **self._cookies_opts(),
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -122,7 +142,8 @@ class YTDownloader:
                 'quiet': True,
                 'no_warnings': True,
                 'extract_flat': True,
-                'skip_download': True
+                'skip_download': True,
+                **self._cookies_opts(),
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -201,11 +222,12 @@ class YTDownloader:
         else:
             format_option = f"{task.get('audio_format', 'bestaudio')}/bestaudio"
             output_name = 'live_audio.%(ext)s' if is_live else 'audio.%(ext)s'
-        
+
         opts = {
             'format': format_option,
             'outtmpl': os.path.join(download_path, output_name),
             'extractor_args': { 'youtube': { 'player_client': ['default', '-tv_simply'], }, },
+            **self._cookies_opts(),
         }
         
         if output_format:

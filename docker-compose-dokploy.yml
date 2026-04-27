@@ -12,6 +12,7 @@ services:
       - TASKS_FILE=/app/data/jsons/tasks.json
       - KEYS_FILE=/app/data/jsons/api_keys.json
       - ADMIN_API_KEY=${ADMIN_API_KEY:-}
+      - COOKIES_B64=${COOKIES_B64:-}
     restart: unless-stopped
 
     networks:
