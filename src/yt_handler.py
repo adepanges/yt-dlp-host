@@ -91,9 +91,21 @@ class YTDownloader:
                         audio_size = self._get_format_size(formats, 'bestaudio', is_video=False)
                     total_size += audio_size
                 
-                return int(total_size * memory.SIZE_BUFFER) if total_size > 0 else -1
+                if total_size > 0:
+                    return int(total_size * memory.SIZE_BUFFER)
+
+                # Fallback: estimate from duration + first available bitrate
+                duration = info.get('duration', 0) or 0
+                tbr = max((f.get('tbr') or 0 for f in formats), default=0)
+                if duration > 0 and tbr > 0:
+                    return int(tbr * duration * 128 * memory.SIZE_BUFFER)
+
+                # Last resort: assume 50 MB so quota check doesn't block download
+                print(f"Could not derive size from metadata for {url}; using 50MB fallback")
+                return 50 * 1024 * 1024
         except Exception as e:
-            print(f"Error in estimate_size: {str(e)}")
+            import traceback
+            print(f"Error in estimate_size: {e}\n{traceback.format_exc()}")
             return -1
     
     def _get_format_size(self, formats: list, format_spec: str, is_video: bool) -> int:
