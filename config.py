@@ -1,11 +1,12 @@
-from dataclasses import dataclass
+import os
+from dataclasses import dataclass, field
 from typing import Final
 
 @dataclass
 class StorageConfig:
-    DOWNLOAD_DIR: Final[str] = '/app/downloads'
-    TASKS_FILE: Final[str] = 'jsons/tasks.json'
-    KEYS_FILE: Final[str] = 'jsons/api_keys.json'
+    DOWNLOAD_DIR: str = field(default_factory=lambda: os.getenv('DOWNLOAD_DIR', '/app/downloads'))
+    TASKS_FILE: str = field(default_factory=lambda: os.getenv('TASKS_FILE', 'jsons/tasks.json'))
+    KEYS_FILE: str = field(default_factory=lambda: os.getenv('KEYS_FILE', 'jsons/api_keys.json'))
 
 @dataclass
 class TaskConfig:
