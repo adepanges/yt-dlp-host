@@ -111,18 +111,18 @@ class YTDownloader:
             return -1
     
     def _get_format_size(self, formats: list, format_spec: str, is_video: bool) -> int:
-        if format_spec == 'bestvideo':
+        if format_spec in ('bestvideo', 'bv', 'bv*'):
             filtered = [f for f in formats if f.get('vcodec') and f.get('vcodec') != 'none']
-        elif format_spec == 'bestaudio':
+        elif format_spec in ('bestaudio', 'ba'):
             filtered = [f for f in formats if f.get('acodec') and f.get('acodec') != 'none']
         else:
             filtered = [f for f in formats if f.get('format_id') == format_spec]
-        
+
         if not filtered:
             if is_video:
-                filtered = [f for f in formats if f.get('vcodec') != 'none']
+                filtered = [f for f in formats if f.get('vcodec') and f.get('vcodec') != 'none']
             else:
-                filtered = [f for f in formats if f.get('acodec') != 'none']
+                filtered = [f for f in formats if f.get('acodec') and f.get('acodec') != 'none']
         
         if not filtered:
             return 0
