@@ -11,6 +11,7 @@ services:
       - DOWNLOAD_DIR=/app/data/downloads
       - TASKS_FILE=/app/data/jsons/tasks.json
       - KEYS_FILE=/app/data/jsons/api_keys.json
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-}
     restart: unless-stopped
 
     networks:

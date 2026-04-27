@@ -1,3 +1,4 @@
+import os
 import secrets
 from functools import wraps
 from datetime import datetime, timedelta
@@ -21,11 +22,12 @@ class AuthManager:
                 return key_name
         return None
     
-    def create_key(self, name: str, permissions: List[str], 
-                   memory_quota: int = memory.DEFAULT_QUOTA_BYTES) -> str:
+    def create_key(self, name: str, permissions: List[str],
+                   memory_quota: int = memory.DEFAULT_QUOTA_BYTES,
+                   key: Optional[str] = None) -> str:
         keys = Storage.load_keys()
         api_key = ApiKey(
-            key=self.generate_key(),
+            key=key or self.generate_key(),
             name=name,
             permissions=permissions,
             memory_quota=memory_quota,
@@ -161,6 +163,7 @@ memory_manager = MemoryManager()
 if not Storage.load_keys():
     auth_manager.create_key(
         "admin",
-        ["create_key", "delete_key", "get_key", "get_keys", 
-         "get_video", "get_audio", "get_live_video", "get_live_audio", "get_info"]
+        ["create_key", "delete_key", "get_key", "get_keys",
+         "get_video", "get_audio", "get_live_video", "get_live_audio", "get_info"],
+        key=os.getenv("ADMIN_API_KEY") or None
     )
