@@ -321,7 +321,9 @@ class YTDownloader:
     
     def _submit_task(self, task_id: str, task_data: dict):
         task_type = task_data['task_type']
-        
+
+        self._update_task(task_id, status=TaskStatus.PROCESSING.value)
+
         if task_type == TaskType.GET_INFO.value:
             self.executor.submit(self.download_info, task_id)
         else:

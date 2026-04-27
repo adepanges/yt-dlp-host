@@ -1,2 +1,2 @@
 Flask==3.0.3
-yt-dlp
+yt-dlp[default,curl-cffi]
