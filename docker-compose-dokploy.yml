@@ -1,0 +1,20 @@
+services:
+  yt-dlp-host:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./downloads:/app/downloads
+      - ./jsons:/app/jsons
+      - ./config.py:/app/config.py
+    environment:
+      - FLASK_APP=src.server:app
+      - FLASK_RUN_HOST=0.0.0.0
+    restart: unless-stopped
+
+    networks:
+      - dokploy-network
+      
+networks:
+  dokploy-network:
+    external: true
