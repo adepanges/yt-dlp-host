@@ -10,7 +10,7 @@ services:
       - FLASK_RUN_HOST=0.0.0.0
       - PYTHONUNBUFFERED=1
       - DOWNLOAD_DIR=/app/data/downloads
-      - TASKS_FILE=/app/data/jsons/tasks.json
+      - TASKS_FILE=/tmp/tasks.json
       - KEYS_FILE=/app/data/jsons/api_keys.json
       - ADMIN_API_KEY=${ADMIN_API_KEY:-}
       - COOKIES_B64=${COOKIES_B64:-}

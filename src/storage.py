@@ -13,6 +13,9 @@ class Storage:
     
     @staticmethod
     def _save_json(file_path: str, data: Dict[str, Any]) -> None:
+        directory = os.path.dirname(file_path)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
     
