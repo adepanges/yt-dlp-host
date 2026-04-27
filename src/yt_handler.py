@@ -78,9 +78,21 @@ class YTDownloader:
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
-                
+
                 total_size = 0
                 formats = info.get('formats', [])
+
+                print(f"[estimate_size] {url} returned {len(formats)} formats:", flush=True)
+                for f in formats:
+                    print(
+                        f"  id={f.get('format_id')!r:30} "
+                        f"vcodec={f.get('vcodec')!r:18} "
+                        f"acodec={f.get('acodec')!r:18} "
+                        f"height={f.get('height')} "
+                        f"tbr={f.get('tbr')} "
+                        f"filesize={f.get('filesize') or f.get('filesize_approx')}",
+                        flush=True
+                    )
                 
                 if video_format:
                     video_size = self._get_format_size(formats, video_format, is_video=True)
