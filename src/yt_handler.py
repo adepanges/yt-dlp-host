@@ -40,9 +40,15 @@ class YTDownloader:
             os.chmod(storage.COOKIES_FILE, 0o600)
 
     def _cookies_opts(self) -> dict:
+        opts = {}
         if os.path.exists(storage.COOKIES_FILE):
-            return {'cookiefile': storage.COOKIES_FILE}
-        return {}
+            opts['cookiefile'] = storage.COOKIES_FILE
+        try:
+            from yt_dlp.networking.impersonate import ImpersonateTarget
+            opts['impersonate'] = ImpersonateTarget('chrome')
+        except Exception as e:
+            print(f"[impersonation] not available: {e}", flush=True)
+        return opts
     
     def _get_task_dir(self, task_id: str) -> str:
         return os.path.join(storage.DOWNLOAD_DIR, task_id)
