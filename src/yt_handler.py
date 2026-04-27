@@ -129,19 +129,19 @@ class YTDownloader:
         
         best = max(filtered, key=lambda f: (f.get('filesize') or f.get('filesize_approx') or 0, f.get('tbr') or 0, f.get('height') or 0 if is_video else f.get('abr') or 0))
         
-        size = best.get('filesize') or best.get('filesize_approx', 0)
-        
-        if size == 0:
-            duration = best.get('duration', 0)
+        size = best.get('filesize') or best.get('filesize_approx') or 0
+
+        if not size:
+            duration = best.get('duration') or 0
             if is_video:
                 bitrate = best.get('tbr') or best.get('vbr') or 0
             else:
                 bitrate = best.get('abr') or best.get('tbr') or 0
-            
+
             if duration > 0 and bitrate > 0:
                 size = int(bitrate * duration * 128)
-        
-        return size
+
+        return int(size or 0)
     
     def download_info(self, task_id: str):
         try:
@@ -228,14 +228,14 @@ class YTDownloader:
         audio_format = task.get('audio_format')
 
         if is_video:
-            video_format = task.get('video_format', 'bestvideo')
+            video_format = task.get('video_format') or 'bv*'
             if audio_format is None or str(audio_format).lower() in ['none', 'null']:
-                format_option = f"{video_format}/bestvideo"
+                format_option = f"{video_format}/b"
             else:
-                format_option = f"{video_format}+{audio_format}/best"
+                format_option = f"{video_format}+{audio_format}/b"
             output_name = 'live_video.%(ext)s' if is_live else 'video.%(ext)s'
         else:
-            format_option = f"{task.get('audio_format', 'bestaudio')}/bestaudio"
+            format_option = f"{task.get('audio_format') or 'ba'}/b"
             output_name = 'live_audio.%(ext)s' if is_live else 'audio.%(ext)s'
 
         opts = {
