@@ -4,10 +4,15 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./downloads:/app/downloads
-      - ./jsons:/app/jsons
-      - ./config.py:/app/config.py
+      - ./downloads:/app/data/downloads
+      - ./jsons:/app/data/jsons
+    env_file:
+      - .env
     environment:
       - FLASK_APP=src.server:app
       - FLASK_RUN_HOST=0.0.0.0
+      - PYTHONUNBUFFERED=1
+      - DOWNLOAD_DIR=/app/data/downloads
+      - TASKS_FILE=/app/data/jsons/tasks.json
+      - KEYS_FILE=/app/data/jsons/api_keys.json
     restart: unless-stopped

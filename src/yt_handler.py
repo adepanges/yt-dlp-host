@@ -4,6 +4,7 @@ import json
 import time
 import shutil
 import threading
+import traceback
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Dict, Any
@@ -53,13 +54,15 @@ class YTDownloader:
             Storage.save_tasks(tasks)
     
     def _handle_error(self, task_id: str, error: Exception):
+        tb = traceback.format_exc()
         self._update_task(
             task_id,
             status=TaskStatus.ERROR.value,
             error=str(error),
+            traceback=tb,
             completed_time=datetime.now().isoformat()
         )
-        print(f"Error in task {task_id}: {error}")
+        print(f"[task {task_id}] ERROR: {error}\n{tb}", flush=True)
     
     def estimate_size(self, url: str, video_format: Optional[str] = None, 
                       audio_format: Optional[str] = None) -> int:
@@ -101,11 +104,10 @@ class YTDownloader:
                     return int(tbr * duration * 128 * memory.SIZE_BUFFER)
 
                 # Last resort: assume 50 MB so quota check doesn't block download
-                print(f"Could not derive size from metadata for {url}; using 50MB fallback")
+                print(f"Could not derive size from metadata for {url}; using 50MB fallback", flush=True)
                 return 50 * 1024 * 1024
         except Exception as e:
-            import traceback
-            print(f"Error in estimate_size: {e}\n{traceback.format_exc()}")
+            print(f"Error in estimate_size: {e}\n{traceback.format_exc()}", flush=True)
             return -1
     
     def _get_format_size(self, formats: list, format_spec: str, is_video: bool) -> int:
@@ -189,8 +191,9 @@ class YTDownloader:
             )
             
             if total_size <= 0:
-                raise Exception("Could not estimate file size")
-            
+                print(f"[task {task_id}] size estimation failed; proceeding without quota check", flush=True)
+                total_size = 50 * 1024 * 1024
+
             keys = Storage.load_keys()
             api_key = keys[task['key_name']]['key']
             memory_manager.check_and_update_quota(api_key, total_size, task_id)

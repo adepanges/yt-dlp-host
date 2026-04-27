@@ -8,6 +8,7 @@ services:
     environment:
       - FLASK_APP=src.server:app
       - FLASK_RUN_HOST=0.0.0.0
+      - PYTHONUNBUFFERED=1
       - DOWNLOAD_DIR=/app/data/downloads
       - TASKS_FILE=/app/data/jsons/tasks.json
       - KEYS_FILE=/app/data/jsons/api_keys.json
